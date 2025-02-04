@@ -1,0 +1,2 @@
+class ArtistParser:
+    pass
