@@ -46,3 +46,9 @@ graph TD;
 
 ```
 # dj_algorithm
+
+
+
+
+### GIT
+git pull origin <branch-name> --allow-unrelated-histories
