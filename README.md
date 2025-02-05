@@ -46,3 +46,10 @@ graph TD;
 
 ```
 # dj_algorithm
+
+## Further Resources
+**OpenSource API for Identifying songs
+https://rapidapi.com/dashydata-dashydata-default/api/shazam-song-recognition-api
+
+**Set lists for DJs
+https://www.mixesdb.com/w/Main_Page
