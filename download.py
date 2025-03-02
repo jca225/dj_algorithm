@@ -20,18 +20,29 @@ def download_song(artist, song_name):
     output_template = os.path.join(DOWNLOAD_DIR, f"{song_name} - {artist}.%(ext)s")
 
     ydl_opts = {
-        'format': 'bestaudio/best',
+        'format': 'bestaudio[ext=m4a]/best[ext=mp4]/best',
         'outtmpl': output_template,  # Save in downloads directory
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
-            'preferredquality': '192',
+            'preferredquality': '160',
         }],
+        'noplaylist': True,  # Avoid playlists
+        'fragment_retries': 3, #retry fragments a few times.
+        'concurrent_fragments': 8, #download 8 fragments at a time.
+        'quiet': False,  # Show progress
+
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([search_url])
-        print(f"Downloaded: {song_name} - {artist} to {DOWNLOAD_DIR}/")
+        try:
+            # Use ytsearch1: to get the first relevant result
+            video_url = f"ytsearch1:{query}"
+            ydl.download([video_url])
+            print(f"Downloaded: {song_name} - {artist} to {DOWNLOAD_DIR}/")
+        except yt_dlp.utils.DownloadError:
+            print("Error downloading song. Try a different query.")
+
 
 if __name__ == "__main__":
     artist = input("Enter the artist's name: ")
