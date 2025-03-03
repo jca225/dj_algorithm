@@ -98,8 +98,93 @@ def draw_dot(compound_song):
 
 
 
-def parse_set():
-    url = "https://www.1001tracklists.com/tracklist/2q5y06k9/alesso-mainstage-creamfields-chile-2024-11-17.html"
+"""
+TODO:
+Tree-Walk all of the dh names in data and create the corresponding pipeline.
+.
+├── 2024
+│   ├── README.md
+│   ├── alesso_set_urls.data
+│   ├── main.py
+│   ├── mark_one.ipynb
+│   ├── models.py
+│   ├── run.py
+│   ├── set_parser.py
+│   └── web_parser.py
+├── Alesso @ Mainstage, Creamfields Chile 2024-11-17_2024-11-17.mx
+├── __pycache__
+│   ├── track.cpython-312.pyc
+│   └── web_scraping.cpython-312.pyc
+├── archive
+│   ├── Alesso @ Mainstage, Creamfields Chile 2024-11-17_2024-11-17.mx
+│   ├── alesso.set
+│   ├── alesso_set_urls.data
+│   ├── alesso_sets.data
+│   ├── artist_parser.py
+│   ├── fourier_analysis.ipynb
+│   ├── main.py
+│   ├── mermaid-filter.err
+│   ├── nlp
+│   │   └── transformer.py
+│   ├── person_instance.pkl
+│   ├── set_scraper_ARCHIVE.ipynb
+│   ├── song_analysis.ipynb
+│   ├── track.py
+│   └── web_scraping.py
+├── data
+│   ├── afrojack
+│   │   └── afrojack.set
+│   ├── alesso
+│   │   └── alesso.set
+│   ├── davidguetta
+│   │   └── davidguetta.set
+│   ├── diplo
+│   │   └── diplo.set
+│   ├── discolines
+│   │   └── discolines.set
+│   ├── fisher
+│   │   └── fisher.set
+│   ├── johnsummit
+│   │   └── johnsummit.set
+│   ├── moguai
+│   │   └── moguai.set
+│   ├── oddmob
+│   │   └── oddmob.set
+│   ├── swedishhousemafia
+│   │   └── swedishhousemafia.set
+│   └── tiesto
+│       └── tiesto.set
+├── download.py
+├── research_papers
+│   ├── 2110.06525v2.pdf
+│   ├── 2208.11428v2.pdf
+│   ├── Acoustics_and_Psychoacoustics_Fourth_Edition.pdf
+│   ├── An Interactive Algorithmic Music System for EDM.pdf
+│   ├── Applications and Advances of Artificial Intelligence in Music Generation A Review.pdf
+│   ├── Fourier Analysis - An Introduction.pdf
+│   ├── Generative AI for Music and Audio.pdf
+│   ├── Hybrid Transformers for Music Source Separation.pdf
+│   ├── Intro_computer_music.pdf
+│   ├── Mathematics of Music.pdf
+│   ├── Music Separation Enhancement with Generative Modeling.pdf
+│   ├── SongCreator Lyrics based Universal Song Generation.pdf
+│   ├── Voice and Accompaniment Separation in Music using Self Attention Convolutional Neural Networks.pdf
+│   ├── fft-notes.pdf
+│   ├── scipy2015_librosa.pdf
+│   └── statisticsinmusicology.pdf
+├── scraper
+├── src
+│   ├── artist_scraper.ipynb
+│   └── set_scraper.py
+└── test_notebooks
+    ├── artist_scraper.py
+    ├── data_structure.ipynb
+    └── set_scraper_outdated.ipynb
+
+
+"""
+def parse_set(url, file_dir):
+    # url = "https://www.1001tracklists.com/tracklist/2q5y06k9/alesso-mainstage-creamfields-chile-2024-11-17.html"
     chop = webdriver.ChromeOptions()
     chop.add_extension("/Users/johncabrahams/Downloads/gighmmpiobklfepjocnamgkkbiglidom.crx")
     driver = webdriver.Chrome(options = chop)
