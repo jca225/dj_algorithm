@@ -9,26 +9,106 @@ import pickle
 from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.errorhandler import ElementNotInteractableException
 from selenium.common.exceptions import NoSuchElementException
-import sys
 
+"""
+TODO:
+Tree-Walk all of the directory names in data and create the corresponding pipeline.
+.
+├── 2024
+│   ├── README.md
+│   ├── alesso_set_urls.data
+│   ├── main.py
+│   ├── mark_one.ipynb
+│   ├── models.py
+│   ├── run.py
+│   ├── set_parser.py
+│   └── web_parser.py
+├── Alesso @ Mainstage, Creamfields Chile 2024-11-17_2024-11-17.mx
+├── __pycache__
+│   ├── track.cpython-312.pyc
+│   └── web_scraping.cpython-312.pyc
+├── archive
+│   ├── Alesso @ Mainstage, Creamfields Chile 2024-11-17_2024-11-17.mx
+│   ├── alesso.set
+│   ├── alesso_set_urls.data
+│   ├── alesso_sets.data
+│   ├── artist_parser.py
+│   ├── fourier_analysis.ipynb
+│   ├── main.py
+│   ├── mermaid-filter.err
+│   ├── nlp
+│   │   └── transformer.py
+│   ├── person_instance.pkl
+│   ├── set_scraper_ARCHIVE.ipynb
+│   ├── song_analysis.ipynb
+│   ├── track.py
+│   └── web_scraping.py
+├── data
+│   ├── afrojack
+│   │   └── afrojack.set
+│   ├── alesso
+│   │   └── alesso.set
+│   ├── davidguetta
+│   │   └── davidguetta.set
+│   ├── diplo
+│   │   └── diplo.set
+│   ├── discolines
+│   │   └── discolines.set
+│   ├── fisher
+│   │   └── fisher.set
+│   ├── johnsummit
+│   │   └── johnsummit.set
+│   ├── moguai
+│   │   └── moguai.set
+│   ├── oddmob
+│   │   └── oddmob.set
+│   ├── swedishhousemafia
+│   │   └── swedishhousemafia.set
+│   └── tiesto
+│       └── tiesto.set
+├── download.py
+├── research_papers
+│   ├── 2110.06525v2.pdf
+│   ├── 2208.11428v2.pdf
+│   ├── Acoustics_and_Psychoacoustics_Fourth_Edition.pdf
+│   ├── An Interactive Algorithmic Music System for EDM.pdf
+│   ├── Applications and Advances of Artificial Intelligence in Music Generation A Review.pdf
+│   ├── Fourier Analysis - An Introduction.pdf
+│   ├── Generative AI for Music and Audio.pdf
+│   ├── Hybrid Transformers for Music Source Separation.pdf
+│   ├── Intro_computer_music.pdf
+│   ├── Mathematics of Music.pdf
+│   ├── Music Separation Enhancement with Generative Modeling.pdf
+│   ├── SongCreator Lyrics based Universal Song Generation.pdf
+│   ├── Voice and Accompaniment Separation in Music using Self Attention Convolutional Neural Networks.pdf
+│   ├── fft-notes.pdf
+│   ├── scipy2015_librosa.pdf
+│   └── statisticsinmusicology.pdf
+├── scraper
+├── src
+│   ├── artist_scraper.ipynb
+│   └── set_scraper.py
+└── test_notebooks
+    ├── artist_scraper.py
+    ├── data_structure.ipynb
+    └── set_scraper_outdated.ipynb
+
+
+"""
 def parse_set(url, file_dir):
+    # url = "https://www.1001tracklists.com/tracklist/2q5y06k9/alesso-mainstage-creamfields-chile-2024-11-17.html"
     chop = webdriver.ChromeOptions()
-    chop.add_extension("/Users/johnmabrahams/Operation Pierce Fulton/ad_blocker.crx")
+    chop.add_extension("/Users/johncabrahams/Desktop/Projects/Operation Pierce Fulton/ad_blocker.crx")
     driver = webdriver.Chrome(options = chop)
-    time.sleep(20)
+    time.sleep(10)
     chld = driver.window_handles[1]
     driver.switch_to.window(chld)
     driver.close()
     current_tab=driver.window_handles[0]
     driver.switch_to.window(current_tab)
     driver.get(url)
+    # time.sleep(5)
 
-    # Check to see if captcha was hit
-    captcha_found = driver.find_element(By.XPATH, "//img[@alt='Captcha]") != None
-
-    if captcha_found:
-        print("Captcha found. Exiting...")
-        sys.exit()
     dj_set = Set()
 
     def _get_id(atom):
@@ -36,6 +116,7 @@ def parse_set(url, file_dir):
         return int(re.search(r"\d+", match.group()).group())
 
     time.sleep(30)
+    """This method gets the date of publication, the number of tracks, and the name of the mix."""
     # Get all the meta data elements for a set
     moduleMetaDataElements = driver.find_elements("xpath", "//body[@id='body']//meta")
     # Relevant and irrelevant meta data names
@@ -53,15 +134,13 @@ def parse_set(url, file_dir):
 
 
 
-    def return_links(song_atom):
-        """This function handles the clickage of link icons and parses the corresponding URL"""
+    def getVisibleSongLink(song_atom):
         link_classes = ["fa-soundcloud", "fa-youtube-play", "fa-spotify", "fa-apple"]
-        # Scroll up to the atom that contained the invisible mashups
+            
         ActionChains(driver).scroll_by_amount(0, -300).perform()
         time.sleep(2)
         ActionChains(driver).scroll_to_element(song_atom).perform()
         time.sleep(2)
-        # Scroll back down
         ActionChains(driver).scroll_by_amount(0, 300).perform()
         time.sleep(2)
         links = [song_atom.find_elements(By.CLASS_NAME, link) for link in link_classes]
@@ -69,6 +148,9 @@ def parse_set(url, file_dir):
         if links_reduced == []:
             return
         links_reduced = [link[0] for link in links_reduced]
+        # Debug print statements
+        # print(str(song_atom.find_element(By.TAG_NAME, "span").text))
+        # print(len(links_reduced))
         all_actual_links = []
 
         for link in links_reduced:
@@ -76,21 +158,26 @@ def parse_set(url, file_dir):
                 link.click()
             except ElementNotInteractableException:
                 continue
-            time.sleep(8)
+            time.sleep(2)
                 
             if not link.get_attribute("onclick"):
                 continue
             link_window = driver.find_element(By.CLASS_NAME, "mP") # f border rB")
             link_close_button = link_window.find_element(By.CLASS_NAME, "close")
+            # try:
+            # ime.sleep(1)
             actual_link = link_window.find_element(By.TAG_NAME, 'iframe').get_attribute("src")
             all_actual_links.append(actual_link)
+                # NB: Error on third alesso set.
+            # except NoSuchElementException:
+            #     print("No such element on dropdown. Continuing...")
+            #     pass
             link_close_button.click()
             time.sleep(2)
         return all_actual_links
 
 
     def initialize_track_variables(track, currentIndex, play_time, retrievedMetaData, song_atom):
-        """This method saves the metadata data for the current atom to our track object"""
         track.index = currentIndex
         try:
             track.name = retrievedMetaData["name"]
@@ -99,8 +186,9 @@ def parse_set(url, file_dir):
             track.name = "id"
             track.artist = "id"
         track.time = play_time
-        track.links = return_links(song_atom)
+        track.links = getVisibleSongLink(song_atom)
 
+    """This method gets the songs of the set"""
     # This expression gets the visible atoms. 
     visible_song_atoms = driver.find_elements(By.CLASS_NAME, "tlpTog")
     # This expression gets the invisible atoms (i.e., those binded to a mix with an ellipses (...))
@@ -136,6 +224,7 @@ def parse_set(url, file_dir):
                 hidden_track = AtomicTrack()
                 currentIndex = invisible_atom.find_element(By.TAG_NAME, "span").text
                 metadata = invisible_atom.find_elements(By.TAG_NAME, "meta")
+                id = _get_id(invisible_atom)
                 retrievedMetaData = {}
                 for data in metadata:
                     retrievedMetaData[data.get_attribute("itemprop")] = data.get_attribute("content")
@@ -145,10 +234,10 @@ def parse_set(url, file_dir):
             time.sleep(3)
             ActionChains(driver).scroll_to_element(main_song_atom).perform()
             ActionChains(driver).scroll_by_amount(0, -300).perform()
+            # ActionChains(driver).scroll_to_element(song_atom).perform()
             time.sleep(3)
             # Click the button to make the visible song atoms invisible
             main_song_atom.find_element(By.CLASS_NAME, "tgBtn").click()
-            # Scroll back down
             ActionChains(driver).scroll_by_amount(0, 300).perform()
 
         # 3. Check for any binded (mixed with) songs, indicated by a 'w/'
