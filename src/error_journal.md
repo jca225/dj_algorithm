@@ -1,0 +1,1 @@
+1. We need to make sure we downloaded enough mixes in the first place in our artist_scraper

@@ -60,6 +60,6 @@ import pickle
 for url in dj_urls:
     filename = extract_between(url) + ".set"
     artist_urls = scrape_artist(url)
-    time.sleep(300)
+    time.sleep(60 * 10)
     with open(filename, 'wb') as file:
         pickle.dump(artist_urls, file)
