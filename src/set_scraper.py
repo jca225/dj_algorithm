@@ -1,106 +1,18 @@
+from data_structures import *
 from datetime import datetime, timedelta
-from dataclasses import dataclass, field
-from graphviz import Digraph
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from dataclasses import dataclass
 from typing import Union
 import re
 import time
 import pickle
 from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.errorhandler import ElementNotInteractableException
-
-
-@dataclass
-class AtomicTrack:
-    index: str = ""
-    name: str = ""
-    artist: str = ""
-    publisher: str = ""
-    url: str = ""
-    time: str = ""
-    links: list[str] = field(default_factory=list)
-
-    def __hash__(self):
-        return hash(self.index)  # Uses the unique index as hash
-
-
-@dataclass
-class CompoundTrack:
-    index: str = ""
-    name: str = ""
-    artist: str = ""
-    publisher: str = ""
-    url: str = ""
-    time: str = ""
-    links: list[str] = field(default_factory=list)
-    binded_atoms: list[AtomicTrack] = field(default_factory=list)
-    invisible_atoms: list[AtomicTrack] = field(default_factory=list)
-
-    def __hash__(self):
-        return hash(self.index)  # Uses the unique index as hash
-
-
-@dataclass
-class Set:
-    name: str = ""
-    date_published: str = ""
-    num_tracks: str = ""
-    url_link: str = ""
-    tracks: dict[str, CompoundTrack]=field(default_factory=dict)
-
-def trace(compound_song):
-    # builds a set of all nodes and edges in a graph
-    nodes, binded_edges, mashed_edges = set(), set(), set()
-    def build(v):
-        if v not in nodes:
-            nodes.add(v)
-            for child in v.binded_atoms:
-                nodes.add(child)
-                binded_edges.add((child, v))
-            for child in v.invisible_atoms:
-                nodes.add(child)
-                mashed_edges.add((child, v))
-    build(compound_song)
-    return nodes, binded_edges, mashed_edges
-
-def draw_dot(compound_song):
-    dot = Digraph(format='svg', graph_attr={'rankdir':'LR'}) # LR = left to right
-
-    nodes, binded_edges, mashed_edges = trace(compound_song)
-    for n in nodes:
-        # Get the id of the node
-        uid = str(id(n))
-        # for any value in the graph, create a rectangular ('record') node for it
-        dot.node(name=uid, label= "{name %s | index %s | time %s}" % (n.name, n.index, n.time), shape='record')
-        if len(n.binded_atoms) != 0:
-            identifier = n.name + " binded with"
-            # if this compound track has some binded atoms, create a node indicating it
-            dot.node(name=identifier, label = "binded with")
-            # and connect this node to it
-            dot.edge(identifier, uid)
-        if len(n.invisible_atoms) != 0:
-            identifier = n.name + " mashup with"
-            # if this compound track has some binded atoms, create a node indicating it
-            dot.node(name=identifier, label = "mashup with")
-            # and connect this node to it
-            dot.edge(identifier, uid)
-    for node in nodes:
-        print(type(node))
-    for n1, n2 in binded_edges:
-        # connect n1 to the op node of n2
-        dot.edge(str(id(n1)), n2.name + " binded with")
-    for n1, n2 in mashed_edges:
-        # connect n1 to the op node of n2
-        dot.edge(str(id(n1)), n2.name + " mashup with")
-    return dot
-
-
+from selenium.common.exceptions import NoSuchElementException
 
 """
 TODO:
-Tree-Walk all of the dh names in data and create the corresponding pipeline.
+Tree-Walk all of the directory names in data and create the corresponding pipeline.
 .
 ├── 2024
 │   ├── README.md
@@ -186,9 +98,9 @@ Tree-Walk all of the dh names in data and create the corresponding pipeline.
 def parse_set(url, file_dir):
     # url = "https://www.1001tracklists.com/tracklist/2q5y06k9/alesso-mainstage-creamfields-chile-2024-11-17.html"
     chop = webdriver.ChromeOptions()
-    chop.add_extension("/Users/johncabrahams/Downloads/gighmmpiobklfepjocnamgkkbiglidom.crx")
+    chop.add_extension("/Users/johncabrahams/Desktop/Projects/Operation Pierce Fulton/ad_blocker.crx")
     driver = webdriver.Chrome(options = chop)
-    time.sleep(5)
+    time.sleep(10)
     chld = driver.window_handles[1]
     driver.switch_to.window(chld)
     driver.close()
@@ -236,8 +148,9 @@ def parse_set(url, file_dir):
         if links_reduced == []:
             return
         links_reduced = [link[0] for link in links_reduced]
-        print(str(song_atom.find_element(By.TAG_NAME, "span").text))
-        print(len(links_reduced))
+        # Debug print statements
+        # print(str(song_atom.find_element(By.TAG_NAME, "span").text))
+        # print(len(links_reduced))
         all_actual_links = []
 
         for link in links_reduced:
@@ -251,8 +164,14 @@ def parse_set(url, file_dir):
                 continue
             link_window = driver.find_element(By.CLASS_NAME, "mP") # f border rB")
             link_close_button = link_window.find_element(By.CLASS_NAME, "close")
+            # try:
+            # ime.sleep(1)
             actual_link = link_window.find_element(By.TAG_NAME, 'iframe').get_attribute("src")
             all_actual_links.append(actual_link)
+                # NB: Error on third alesso set.
+            # except NoSuchElementException:
+            #     print("No such element on dropdown. Continuing...")
+            #     pass
             link_close_button.click()
             time.sleep(2)
         return all_actual_links
@@ -341,8 +260,8 @@ def parse_set(url, file_dir):
             break
 
 
-
-    file = "_".join([dj_set.name, dj_set.date_published]) + ".mx"
+    # TODO: Do this in the appropriate dj name file
+    file = file_dir + "_".join([dj_set.name, dj_set.date_published]) + ".mx"
     with open(file, 'wb') as file:
         pickle.dump(dj_set, file)
     driver.quit()
@@ -350,8 +269,5 @@ def parse_set(url, file_dir):
 
 """
 TODO:
-top level parent directory for each artist
-contains:
-1. Directory for sets
-2. File including all the urls for sets
+Add method for checking if set already exists. Should be fairly straight-forward
 """
