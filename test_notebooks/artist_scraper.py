@@ -11,18 +11,21 @@ def scrape_artist(url):
     urls = []
     all_rows = set()
     prev_rows_count = 0
+    already_scrolled = False
     while True:
         rows = driver.find_elements(By.CLASS_NAME, "bItm")
         all_rows |= set(rows)
+        if len(rows) == prev_rows_count and not already_scrolled:
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            already_scrolled = True
+            time.sleep(60)
+            continue
         if len(rows) == prev_rows_count:
             print("End of page reached")
             break
-        # if  len(all_rows) >= 300:
-        #     print("300 sets parsed")
-        #     break
         prev_rows_count = len(rows) 
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(20)
+        time.sleep(60)
             
     for row in all_rows:
         currentUrl = "https://www.1001tracklists.com" + row.get_attribute('onclick').split("window.open(")[1].split("\',")[0][1:-2]
@@ -50,14 +53,21 @@ dj_urls = [
 ]
 
 
+
+# TODO: Find the last set in david guetta, assert
+# it is the actual last set
 import re
 import pickle
 def extract_between(url):
     match = re.search(r'https://www.1001tracklists.com/dj/(.*?)/index.html', url)
     return match.group(1) if match else None
 
+idx = 0
 import pickle
 for url in dj_urls:
+    idx += 1
+    if idx < 3:
+        continue
     filename = extract_between(url) + ".set"
     artist_urls = scrape_artist(url)
     time.sleep(60 * 10)

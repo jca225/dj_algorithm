@@ -36,4 +36,3 @@ for artist_folder in os.listdir(data_directory):
         except Exception as e:
             print(str(e))
             print("On url: " + str(artist_url))
-            break

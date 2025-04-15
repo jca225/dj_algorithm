@@ -65,7 +65,15 @@ graph TD;
 ```
 # dj_algorithm
 
+We hypothesize the existence of a seed that will dictate the timbre quality of the set. Our intuition is that all DJs share the same distribution of music at a very abstract level - one that is dissociated with the songs themselves. However, once a particular seed is chosen, the distribution becomes concrete and based on actual songs. 
 
+
+We can think of it like the English language: at a very abstract level, you have the science behind the English language - things like grammar and vocabulary. But these are abstractions. What if we want to predict a certain poet's art over the English language? Their style, and what makes their words and the sequence of words so meaningful? We hypothesize that we can create an algorithm that will learn the grammar and spelling and other abstractions at a very high level, and then, based on the poet, convert this into poetry corresponding to that artist. Think of it like adding another layer to ChatGPT, where we now say "okay, you got the grammar down. Now make it art."
+Essentially, we hypothesize a music theory behind DJing.
+This could be useful:
+https://learningtodj.com/blog/music-theory-essentials-for-djs-bars/
+
+But how does one learn how to write in the first place? Newton tells us that we must stand on the shoulders of giants - we learn from predecessors! And we combine things based on what we like and our own past experiences into our own unique style. This is how a poet is born. So then what if we can take these seeds, along with some cleverness that is unknown now, and combine them and add them together in such a way that we mimic the creation of a new poet? This, is what Alan does. A poet of poets.
 
 
 ### GIT
@@ -77,3 +85,5 @@ https://rapidapi.com/dashydata-dashydata-default/api/shazam-song-recognition-api
 
 **Set lists for DJs
 https://www.mixesdb.com/w/Main_Page
+
+
