@@ -9,3 +9,8 @@ Machine Learning Algo
 2. Create method for checking if dj set was already parsed and continuing
 4. Predict the most dense value for remixes (the instrumental)
 5. For withs, just treat them as a special type meaning mixed in with.
+
+
+
+There is a captcha, from literally scrolling down a webpage.
+How do we solve this?
