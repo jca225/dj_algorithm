@@ -6,32 +6,43 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(filename="artist_scraper_log.log", encoding="utf-8", level=logging.DEBUG)
+logging.basicConfig(filename="artist_scraper_log_2.log", encoding="utf-8", level=logging.DEBUG)
 
 
 def scrape_artist(url):
     """Scrape sets from artist given by `url`, and saves them on disk"""
+    chop = webdriver.ChromeOptions()
+    chop.add_extension("/Users/johnmabrahams/Desktop/dj_algorithm/ad_blocker.crx")
+    driver = webdriver.Chrome(options = chop)
+    time.sleep(20)
+    chld = driver.window_handles[1]
+    driver.switch_to.window(chld)
+    driver.close()
+    current_tab=driver.window_handles[0]
+    driver.switch_to.window(current_tab)
     # Initialize the Chrome driver
     driver = webdriver.Chrome()
     driver.get(url)
     urls = []
     all_rows = set()
     prev_rows_count = 0
-    already_scrolled = False
+    scroll_counter = 0
+    scroll_heuristic = lambda x : x > 10 
     while True:
         rows = driver.find_elements(By.CLASS_NAME, "bItm")
         all_rows |= set(rows)
-        if len(rows) == prev_rows_count and not already_scrolled:
+        if len(rows) == prev_rows_count and not scroll_heuristic(scroll_counter):
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            already_scrolled = True
-            time.sleep(random.uniform(40, 80))
+            scroll_counter += 1
+            time.sleep(random.uniform(1, 4))
             continue
         if len(rows) == prev_rows_count:
             print("End of page reached")
             break
+        scroll_counter = 0
         prev_rows_count = len(rows) 
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(random.uniform(40, 80))
+        time.sleep(random.uniform(1, 4))
             
     for row in all_rows:
         currentUrl = "https://www.1001tracklists.com" + row.get_attribute('onclick').split("window.open(")[1].split("\',")[0][1:-2]
@@ -79,7 +90,7 @@ for url in dj_urls:
     if idx < 3:
         continue
     logger.debug("Parsing artist: " + extract_between(url))
-    filename = extract_between(url) + "/" + extract_between(url) + ".set"
+    filename = extract_between(url) + ".set"
     # Timer for debugging
     start_time = time.time()
     artist_urls = scrape_artist(url)
@@ -90,3 +101,7 @@ for url in dj_urls:
     time.sleep(60 * random.uniform(8, 12))
     with open(filename, 'wb') as file:
         pickle.dump(artist_urls, file)
+
+
+
+        
