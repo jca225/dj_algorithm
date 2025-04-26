@@ -8,13 +8,18 @@ import time
 import pickle
 from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.errorhandler import ElementNotInteractableException
-from selenium.common.exceptions import NoSuchElementException
 import sys
+
+from selenium.common.exceptions import NoSuchElementException
+
+
 
 def parse_set(url, file_dir):
     chop = webdriver.ChromeOptions()
     chop.add_extension("/Users/johnmabrahams/Operation Pierce Fulton/ad_blocker.crx")
     driver = webdriver.Chrome(options = chop)
+    
+    
     time.sleep(20)
     chld = driver.window_handles[1]
     driver.switch_to.window(chld)
@@ -24,11 +29,14 @@ def parse_set(url, file_dir):
     driver.get(url)
 
     # Check to see if captcha was hit
-    captcha_found = driver.find_element(By.XPATH, "//img[@alt='Captcha]") != None
-
-    if captcha_found:
+    try:
+        driver.find_element(By.XPATH, "//img[@alt='Captcha']")
         print("Captcha found. Exiting...")
+        driver.quit()
         sys.exit()
+    except NoSuchElementException:
+        print("No captcha found, continuing...")
+        
     dj_set = Set()
 
     def _get_id(atom):
